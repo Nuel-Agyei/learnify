@@ -24,42 +24,45 @@ class Dashboard extends StatelessWidget {
         children:[
           const Row(
             children: [
-              Filters(filter: 'All', color: Colors.blue,),
-              Filters(filter: 'Audio Only', color: Color.fromARGB(255, 205, 77, 228),),
-              Filters(filter: 'Video Only', color: Color.fromARGB(255, 135, 204, 138),),
-              Filters(filter: 'Text Only', color: Color.fromARGB(219, 15, 128, 241),),
+              Filters(filter: 'All', color: Color.fromARGB(255, 163,145,147),),
+              Filters(filter: 'Audio Only', color: Color.fromARGB(255, 246,224,181),),
+              Filters(filter: 'Video Only', color: Color.fromARGB(255, 238,169,144),),
+              Filters(filter: 'Text Only', color: Color.fromARGB(219, 170,111,115),),
             ]
           ),
-           Card(
-            elevation: 2,
-            margin:const EdgeInsets.all(12),
-             shape: RoundedRectangleBorder(
-               borderRadius: BorderRadius.circular(6.0), // You can adjust the radius as needed
-             ),
-             child:const Padding(
-               padding: EdgeInsets.all(8.0),
-               child:Column(
-                 crossAxisAlignment: CrossAxisAlignment.start,
-                 children: [
-                  Text('Flash Card 1', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  Center(widthFactor: 2,child: Icon(Icons.image, size: 256,),),
-                  ReadMoreText(
-                    trimMode:TrimMode.Line,
-                    trimLines:4,  
-                    '''Covalent bonds are chemical bonds formed when two atoms share electrons. This sharing occurs to achieve a stable electron configuration, often resembling a noble gas.
-                      Types:
-                      Single bonds: One pair of electrons shared.
-                      Double bonds: Two pairs of electrons shared.
-                      Triple bonds: Three pairs of electrons shared.
-                      Polarity:
-                      Polar covalent bonds: Unequal sharing of electrons due to differences in electronegativity.
-                      Nonpolar covalent bonds: Equal sharing of electrons due to similar electronegativities.
-                      Examples:
-                      Water (H₂O): Polar covalent bonds between hydrogen and oxygen.
-                      Methane (CH₄): Nonpolar covalent bonds between carbon and hydrogen.
-                      Covalent bonds are common in organic molecules and many other compounds.''', 
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                 ],
+           Container(
+            width: 375,
+             child: Card(
+              elevation: 2,
+              margin:const EdgeInsets.all(12),
+               shape: RoundedRectangleBorder(
+                 borderRadius: BorderRadius.circular(6.0), // You can adjust the radius as needed
+               ),
+               child:const Padding(
+                 padding: EdgeInsets.all(8.0),
+                 child:Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                    Text('Flash Card 1', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Center(widthFactor: 2,child: Icon(Icons.image, size: 256,),),
+                    ReadMoreText(
+                      trimMode:TrimMode.Line,
+                      trimLines:4,  
+                      '''Covalent bonds are chemical bonds formed when two atoms share electrons. This sharing occurs to achieve a stable electron configuration, often resembling a noble gas.
+                        Types:
+                        Single bonds: One pair of electrons shared.
+                        Double bonds: Two pairs of electrons shared.
+                        Triple bonds: Three pairs of electrons shared.
+                        Polarity:
+                        Polar covalent bonds: Unequal sharing of electrons due to differences in electronegativity.
+                        Nonpolar covalent bonds: Equal sharing of electrons due to similar electronegativities.
+                        Examples:
+                        Water (H₂O): Polar covalent bonds between hydrogen and oxygen.
+                        Methane (CH₄): Nonpolar covalent bonds between carbon and hydrogen.
+                        Covalent bonds are common in organic molecules and many other compounds.''', 
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                   ],
+                 ),
                ),
              ),
            )
