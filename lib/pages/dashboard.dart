@@ -30,7 +30,7 @@ class Dashboard extends StatelessWidget {
               Filters(filter: 'Text Only', color: Color.fromARGB(219, 170,111,115),),
             ]
           ),
-           Container(
+           SizedBox(
             width: 375,
              child: Card(
               elevation: 2,
@@ -66,6 +66,7 @@ class Dashboard extends StatelessWidget {
                ),
              ),
            )
+           
            ]
       ),
     );
