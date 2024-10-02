@@ -12,11 +12,14 @@ class AddFlashcard extends StatefulWidget {
 }
 
 class _AddFlashcardState extends State<AddFlashcard> {
+  final TextEditingController question = TextEditingController();
+  final TextEditingController answer = TextEditingController();
+  final TextEditingController tag = TextEditingController();
   File? image;
   final ImagePicker picker = ImagePicker();
 
   Future<void> pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         image = File(pickedFile.path);
@@ -42,16 +45,55 @@ class _AddFlashcardState extends State<AddFlashcard> {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            GestureDetector(
-              onTap: pickImage,
-              child: image != null ? Image.file(image!, 
-              fit: BoxFit.cover,) : const Icon(Icons.image_outlined, size: 128,),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: pickImage,
+                child: Center(
+                  child: Container(
+                    width: 150,
+                    height: 150,
+                    child: image != null ? Image.file(image!, fit: BoxFit.cover,) : const Icon(Icons.image_outlined, size: 150,),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32,),
+              
+              //Question
+              TextField(
+                controller: question,
+                decoration:const InputDecoration(
+                  focusColor: Colors.brown,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(24))),
+                  labelText: 'Question',
+                ),
+              ),
+
+              //Answer
+              TextField(
+                controller: answer,
+                decoration:const InputDecoration(
+                  focusColor: Colors.brown,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(24))),
+                  labelText: 'Answer',
+                ),
+              ),
+              const SizedBox(height: 32,),
+
+              //Tag
+              TextField(
+                controller: tag,
+                decoration:const InputDecoration(
+                  focusColor: Colors.brown,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(24))),
+                  labelText: 'Tag',
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
