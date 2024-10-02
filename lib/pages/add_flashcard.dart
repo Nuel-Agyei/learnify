@@ -98,7 +98,7 @@ class _AddFlashcardState extends State<AddFlashcard> {
               GestureDetector(
                 onTap: pickImage,
                 child: Center(
-                  child: Container(
+                  child: SizedBox(
                     width: 150,
                     height: 150,
                     child: image != null ? Image.file(image!, fit: BoxFit.cover,) : const Icon(Icons.image_outlined, size: 150,),
@@ -137,12 +137,14 @@ class _AddFlashcardState extends State<AddFlashcard> {
                   labelText: 'Tag',
                 ),
               ),
-
+                if(isRecording) const Text('Recording', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),), 
               //Audio
               ElevatedButton(onPressed:isRecording ? stop : record, 
               child:isRecording ? const Text('Stop') : const Text('Record')
               ),
-              ElevatedButton(onPressed: play, child: Icon(Icons.play_arrow_sharp))
+              if(isRecording && path != '') 
+                 ElevatedButton(onPressed: play, child: const Icon(Icons.play_arrow_sharp))
+              ,
             ],
           ),
         ),

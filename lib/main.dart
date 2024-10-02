@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:learnify/pages/add_flashcard.dart';
-import 'package:learnify/pages/dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,7 +8,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
