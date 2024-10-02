@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:record/record.dart';
 // import 'package';
 
 class AddFlashcard extends StatefulWidget {
@@ -12,11 +14,15 @@ class AddFlashcard extends StatefulWidget {
 }
 
 class _AddFlashcardState extends State<AddFlashcard> {
+  bool isRecording = false;
   final TextEditingController question = TextEditingController();
   final TextEditingController answer = TextEditingController();
   final TextEditingController tag = TextEditingController();
   File? image;
   final ImagePicker picker = ImagePicker();
+  final AudioRecorder recorder = AudioRecorder();
+  final String path = '';
+  final AudioPlayer player = AudioPlayer();
 
   Future<void> pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -26,6 +32,45 @@ class _AddFlashcardState extends State<AddFlashcard> {
       });
     }
   }
+
+  Future<void> record()async{
+    try{
+      if(await recorder.hasPermission()){
+        await recorder.start(const RecordConfig(), path: path);
+        setState(() {
+          isRecording = true;
+        });
+      }
+    
+    }catch(e){
+      print(e);
+    }
+  }
+  
+  Future<void> stop()async{
+    try{
+      if(await recorder.hasPermission()){
+        await recorder.stop();
+        setState(() {
+          isRecording = false;
+        });
+      }
+    
+    }catch(e){
+      print(e);
+    }
+  }
+
+  Future<void>play()async{
+    try{
+      Source source = UrlSource(path);
+      await player.play(source);
+    }
+    catch(e){
+      print(e);
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,6 +137,12 @@ class _AddFlashcardState extends State<AddFlashcard> {
                   labelText: 'Tag',
                 ),
               ),
+
+              //Audio
+              ElevatedButton(onPressed:isRecording ? stop : record, 
+              child:isRecording ? const Text('Stop') : const Text('Record')
+              ),
+              ElevatedButton(onPressed: play, child: Icon(Icons.play_arrow_sharp))
             ],
           ),
         ),

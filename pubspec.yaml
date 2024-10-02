@@ -44,8 +44,10 @@ dependencies:
   readmore: ^3.0.0
   drift: ^2.20.3
   image_picker: ^1.1.2
-  another_audio_recorder: ^1.2.1
+  record: ^5.1.2
+  audioplayers: ^6.1.0
 
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
