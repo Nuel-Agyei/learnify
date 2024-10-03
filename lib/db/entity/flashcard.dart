@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
 class Flashcard extends Table {
-  TextColumn get id => text()();
+  IntColumn get id => integer().autoIncrement()();
   TextColumn get deck => text()();
   TextColumn get question => text()();
   TextColumn get answer => text()();

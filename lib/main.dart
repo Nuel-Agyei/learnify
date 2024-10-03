@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:learnify/db/entity/flashcard.dart';
 import 'package:learnify/pages/add_flashcard.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(
+  providers: [
+    Provider<Flashcard>(create: (_) => Flashcard()),
+  ],
+  child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

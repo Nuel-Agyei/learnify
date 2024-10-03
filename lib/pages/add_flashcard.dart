@@ -1,9 +1,14 @@
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:learnify/db/entity/remote/db.dart';
+import 'package:provider/provider.dart';
 import 'package:record/record.dart'; // Keep this import as per your request
 import 'package:path_provider/path_provider.dart';
+
+import '../db/entity/flashcard.dart';
 
 class AddFlashcard extends StatefulWidget {
   const AddFlashcard({super.key});
@@ -81,6 +86,7 @@ class _AddFlashcardState extends State<AddFlashcard> {
 
   @override
   Widget build(BuildContext context) {
+    final fc = Provider.of<DB>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -94,7 +100,12 @@ class _AddFlashcardState extends State<AddFlashcard> {
               icon: const Icon(Icons.check, size: 32),
               splashRadius: 104,
               onPressed: () {
-                print('saved');
+                fc.addFlashcard(FlashcardCompanion(
+                  question: drift.Value(question.text),
+                  answer: drift.Value(answer.text),
+                  tag: drift.Value(tag.text),
+                  image: drift.Value(image?.path),
+                ));
               },
             ),
           ),
