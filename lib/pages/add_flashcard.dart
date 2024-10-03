@@ -1,10 +1,9 @@
 import 'dart:io';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:record/record.dart';
-// import 'package';
+import 'package:record/record.dart'; // Keep this import as per your request
+import 'package:path_provider/path_provider.dart';
 
 class AddFlashcard extends StatefulWidget {
   const AddFlashcard({super.key});
@@ -15,15 +14,16 @@ class AddFlashcard extends StatefulWidget {
 
 class _AddFlashcardState extends State<AddFlashcard> {
   bool isRecording = false;
+  String? filePath; // Updated to store the valid file path
   final TextEditingController question = TextEditingController();
   final TextEditingController answer = TextEditingController();
   final TextEditingController tag = TextEditingController();
   File? image;
   final ImagePicker picker = ImagePicker();
-  final AudioRecorder recorder = AudioRecorder();
-  final String path = '';
+  final AudioRecorder recorder = AudioRecorder(); // Keep AudioRecorder as is
   final AudioPlayer player = AudioPlayer();
 
+  // Method to pick image from gallery
   Future<void> pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -33,67 +33,79 @@ class _AddFlashcardState extends State<AddFlashcard> {
     }
   }
 
-  Future<void> record()async{
-    try{
-      if(await recorder.hasPermission()){
-        await recorder.start(const RecordConfig(), path: path);
-        setState(() {
-          isRecording = true;
-        });
-      }
-    
-    }catch(e){
-      print(e);
-    }
+  // Method to get valid file path for saving the audio file
+  Future<String> getFilePath() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return '${directory.path}/audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
   }
-  
-  Future<void> stop()async{
-    try{
-      if(await recorder.hasPermission()){
-        await recorder.stop();
-        setState(() {
-          isRecording = false;
-        });
-      }
-    
-    }catch(e){
-      print(e);
+
+  // Start recording audio
+  Future<void> record() async {
+    try {
+      filePath = await getFilePath(); // Ensure valid file path
+      await recorder.start(const RecordConfig(), path: filePath!); // Pass valid path to start recording
+      setState(() {
+        isRecording = true;
+      });
+    } catch (e) {
+      print("Error starting recording: $e");
     }
   }
 
-  Future<void>play()async{
-    try{
-      Source source = UrlSource(path);
-      await player.play(source);
-    }
-    catch(e){
-      print(e);
+  // Stop recording audio
+  Future<void> stop() async {
+    try {
+      await recorder.stop(); // Stop recording
+      setState(() {
+        if(isRecording == true) {
+          isRecording = false;
+        }
+        // isRecording = false;
+        print('filePath: $filePath');
+      });
+    } catch (e) {
+      print("Error stopping recording: $e");
     }
   }
-  
+
+  // Play recorded audio
+  Future<void> play() async {
+    try {
+      if (filePath != null && !isRecording) {
+        await player.play(UrlSource(filePath!)); // Play the saved audio file
+      }
+    } catch (e) {
+      print("Error playing audio: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:const Text('Add Flashcard', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),),
+        title: const Text(
+          'Add Flashcard',
+          style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+        ),
         actions: [
           Padding(
-            padding:const EdgeInsets.fromLTRB(0, 0, 12, 0),
-            child: IconButton(icon:const Icon(Icons.check, size: 32,),
-            splashRadius:104,
-            onPressed: (){
-              print('saved');
-            },
+            padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
+            child: IconButton(
+              icon: const Icon(Icons.check, size: 32),
+              splashRadius: 104,
+              onPressed: () {
+                print('saved');
+              },
             ),
-            
-          )
+          ),
         ],
       ),
       body: Center(
         child: SingleChildScrollView(
           child: Column(
+
             mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               GestureDetector(
                 onTap: pickImage,
@@ -101,50 +113,65 @@ class _AddFlashcardState extends State<AddFlashcard> {
                   child: SizedBox(
                     width: 150,
                     height: 150,
-                    child: image != null ? Image.file(image!, fit: BoxFit.cover,) : const Icon(Icons.image_outlined, size: 150,),
+                    child: image != null
+                        ? Image.file(image!, fit: BoxFit.cover)
+                        : const Icon(Icons.image_outlined, size: 150),
                   ),
                 ),
               ),
-              const SizedBox(height: 32,),
-              
-              //Question
+              const SizedBox(height: 32),
+              // Question input field
               TextField(
                 controller: question,
-                decoration:const InputDecoration(
+                decoration: const InputDecoration(
                   focusColor: Colors.brown,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(24))),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(24))),
                   labelText: 'Question',
                 ),
               ),
-
-              //Answer
+              const SizedBox(height: 16),
+              // Answer input field
               TextField(
                 controller: answer,
-                decoration:const InputDecoration(
+                decoration: const InputDecoration(
                   focusColor: Colors.brown,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(24))),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(24))),
                   labelText: 'Answer',
                 ),
               ),
-              const SizedBox(height: 32,),
-
-              //Tag
+              const SizedBox(height: 16),
+              // Tag input field
               TextField(
                 controller: tag,
-                decoration:const InputDecoration(
+                decoration: const InputDecoration(
                   focusColor: Colors.brown,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(24))),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(24))),
                   labelText: 'Tag',
                 ),
               ),
-                if(isRecording) const Text('Recording', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),), 
-              //Audio
-              ElevatedButton(onPressed:isRecording ? stop : record, 
-              child:isRecording ? const Text('Stop') : const Text('Record')
+              const SizedBox(height: 32),
+              // Recording status
+              if (isRecording)
+                const Text(
+                  'Recording',
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                ),
+              const SizedBox(height: 16),
+              // Record/Stop button
+              ElevatedButton(
+                onPressed: isRecording ? stop : record,
+
+                child: isRecording ? const Text('Stop') : const Text('Record'),
               ),
-              if(isRecording && path != '') 
-                 ElevatedButton(onPressed: play, child: const Icon(Icons.play_arrow_sharp))
-              ,
+              // Play button (visible when recording stops and file exists)
+              if (!isRecording && filePath != null)
+                ElevatedButton(
+                  onPressed: play,
+                  child: const Icon(Icons.play_arrow_sharp),
+                ),
             ],
           ),
         ),
