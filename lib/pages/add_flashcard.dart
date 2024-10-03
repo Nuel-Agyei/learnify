@@ -4,11 +4,10 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:learnify/db/entity/remote/db.dart';
+import 'package:learnify/pages/dashboard.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart'; // Keep this import as per your request
 import 'package:path_provider/path_provider.dart';
-
-import '../db/entity/flashcard.dart';
 
 class AddFlashcard extends StatefulWidget {
   const AddFlashcard({super.key});
@@ -53,7 +52,7 @@ class _AddFlashcardState extends State<AddFlashcard> {
         isRecording = true;
       });
     } catch (e) {
-      print("Error starting recording: $e");
+      debugPrint("Error starting recording: $e");
     }
   }
 
@@ -66,10 +65,10 @@ class _AddFlashcardState extends State<AddFlashcard> {
           isRecording = false;
         }
         // isRecording = false;
-        print('filePath: $filePath');
+        debugPrint('filePath: $filePath');
       });
     } catch (e) {
-      print("Error stopping recording: $e");
+      debugPrint("Error stopping recording: $e");
     }
   }
 
@@ -80,7 +79,7 @@ class _AddFlashcardState extends State<AddFlashcard> {
         await player.play(UrlSource(filePath!)); // Play the saved audio file
       }
     } catch (e) {
-      print("Error playing audio: $e");
+      debugPrint("Error playing audio: $e");
     }
   }
 
@@ -105,7 +104,9 @@ class _AddFlashcardState extends State<AddFlashcard> {
                   answer: drift.Value(answer.text),
                   tag: drift.Value(tag.text),
                   image: drift.Value(image?.path),
+                  audio: drift.Value(filePath),
                 ));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Dashboard()));
               },
             ),
           ),
@@ -122,8 +123,8 @@ class _AddFlashcardState extends State<AddFlashcard> {
                 onTap: pickImage,
                 child: Center(
                   child: SizedBox(
-                    width: 150,
-                    height: 150,
+                    width: 256,
+                    height: 256,
                     child: image != null
                         ? Image.file(image!, fit: BoxFit.cover)
                         : const Icon(Icons.image_outlined, size: 150),

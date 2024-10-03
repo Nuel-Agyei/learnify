@@ -21,8 +21,8 @@ class $FlashcardTable extends Flashcard
   static const VerificationMeta _deckMeta = const VerificationMeta('deck');
   @override
   late final GeneratedColumn<String> deck = GeneratedColumn<String>(
-      'deck', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'deck', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _questionMeta =
       const VerificationMeta('question');
   @override
@@ -68,8 +68,6 @@ class $FlashcardTable extends Flashcard
     if (data.containsKey('deck')) {
       context.handle(
           _deckMeta, deck.isAcceptableOrUnknown(data['deck']!, _deckMeta));
-    } else if (isInserting) {
-      context.missing(_deckMeta);
     }
     if (data.containsKey('question')) {
       context.handle(_questionMeta,
@@ -109,7 +107,7 @@ class $FlashcardTable extends Flashcard
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       deck: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}deck'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}deck']),
       question: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}question'])!,
       answer: attachedDatabase.typeMapping
@@ -131,7 +129,7 @@ class $FlashcardTable extends Flashcard
 
 class FlashcardData extends DataClass implements Insertable<FlashcardData> {
   final int id;
-  final String deck;
+  final String? deck;
   final String question;
   final String answer;
   final String? image;
@@ -139,7 +137,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
   final String tag;
   const FlashcardData(
       {required this.id,
-      required this.deck,
+      this.deck,
       required this.question,
       required this.answer,
       this.image,
@@ -149,7 +147,9 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['deck'] = Variable<String>(deck);
+    if (!nullToAbsent || deck != null) {
+      map['deck'] = Variable<String>(deck);
+    }
     map['question'] = Variable<String>(question);
     map['answer'] = Variable<String>(answer);
     if (!nullToAbsent || image != null) {
@@ -165,7 +165,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
   FlashcardCompanion toCompanion(bool nullToAbsent) {
     return FlashcardCompanion(
       id: Value(id),
-      deck: Value(deck),
+      deck: deck == null && nullToAbsent ? const Value.absent() : Value(deck),
       question: Value(question),
       answer: Value(answer),
       image:
@@ -181,7 +181,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return FlashcardData(
       id: serializer.fromJson<int>(json['id']),
-      deck: serializer.fromJson<String>(json['deck']),
+      deck: serializer.fromJson<String?>(json['deck']),
       question: serializer.fromJson<String>(json['question']),
       answer: serializer.fromJson<String>(json['answer']),
       image: serializer.fromJson<String?>(json['image']),
@@ -194,7 +194,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'deck': serializer.toJson<String>(deck),
+      'deck': serializer.toJson<String?>(deck),
       'question': serializer.toJson<String>(question),
       'answer': serializer.toJson<String>(answer),
       'image': serializer.toJson<String?>(image),
@@ -205,7 +205,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
 
   FlashcardData copyWith(
           {int? id,
-          String? deck,
+          Value<String?> deck = const Value.absent(),
           String? question,
           String? answer,
           Value<String?> image = const Value.absent(),
@@ -213,7 +213,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
           String? tag}) =>
       FlashcardData(
         id: id ?? this.id,
-        deck: deck ?? this.deck,
+        deck: deck.present ? deck.value : this.deck,
         question: question ?? this.question,
         answer: answer ?? this.answer,
         image: image.present ? image.value : this.image,
@@ -264,7 +264,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
 
 class FlashcardCompanion extends UpdateCompanion<FlashcardData> {
   final Value<int> id;
-  final Value<String> deck;
+  final Value<String?> deck;
   final Value<String> question;
   final Value<String> answer;
   final Value<String?> image;
@@ -281,14 +281,13 @@ class FlashcardCompanion extends UpdateCompanion<FlashcardData> {
   });
   FlashcardCompanion.insert({
     this.id = const Value.absent(),
-    required String deck,
+    this.deck = const Value.absent(),
     required String question,
     required String answer,
     this.image = const Value.absent(),
     this.audio = const Value.absent(),
     required String tag,
-  })  : deck = Value(deck),
-        question = Value(question),
+  })  : question = Value(question),
         answer = Value(answer),
         tag = Value(tag);
   static Insertable<FlashcardData> custom({
@@ -313,7 +312,7 @@ class FlashcardCompanion extends UpdateCompanion<FlashcardData> {
 
   FlashcardCompanion copyWith(
       {Value<int>? id,
-      Value<String>? deck,
+      Value<String?>? deck,
       Value<String>? question,
       Value<String>? answer,
       Value<String?>? image,
@@ -385,7 +384,7 @@ abstract class _$DB extends GeneratedDatabase {
 
 typedef $$FlashcardTableCreateCompanionBuilder = FlashcardCompanion Function({
   Value<int> id,
-  required String deck,
+  Value<String?> deck,
   required String question,
   required String answer,
   Value<String?> image,
@@ -394,7 +393,7 @@ typedef $$FlashcardTableCreateCompanionBuilder = FlashcardCompanion Function({
 });
 typedef $$FlashcardTableUpdateCompanionBuilder = FlashcardCompanion Function({
   Value<int> id,
-  Value<String> deck,
+  Value<String?> deck,
   Value<String> question,
   Value<String> answer,
   Value<String?> image,
@@ -501,7 +500,7 @@ class $$FlashcardTableTableManager extends RootTableManager<
               $$FlashcardTableOrderingComposer(ComposerState(db, table)),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<String> deck = const Value.absent(),
+            Value<String?> deck = const Value.absent(),
             Value<String> question = const Value.absent(),
             Value<String> answer = const Value.absent(),
             Value<String?> image = const Value.absent(),
@@ -519,7 +518,7 @@ class $$FlashcardTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            required String deck,
+            Value<String?> deck = const Value.absent(),
             required String question,
             required String answer,
             Value<String?> image = const Value.absent(),

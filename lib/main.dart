@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:learnify/db/entity/flashcard.dart';
+import 'package:learnify/db/entity/remote/db.dart';
 import 'package:learnify/pages/add_flashcard.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(MultiProvider(
   providers: [
-    Provider<Flashcard>(create: (_) => Flashcard()),
+    Provider<DB>(create: (_) => DB()),
   ],
   child: const MyApp()));
 }
