@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:learnify/db/entity/remote/db.dart';
 import 'package:learnify/pages/add_flashcard.dart';
+import 'package:learnify/record.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const AddFlashcard(),
+      home: const Record(),
     );
   }
 }

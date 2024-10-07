@@ -18,16 +18,16 @@ class AddFlashcard extends StatefulWidget {
 
 class _AddFlashcardState extends State<AddFlashcard> {
   bool isRecording = false;
-  String? filePath; // Updated to store the valid file path
+  bool isPlaying = false; // New variable to track if audio is playing
+  String? filePath;
   final TextEditingController question = TextEditingController();
   final TextEditingController answer = TextEditingController();
   final TextEditingController tag = TextEditingController();
   File? image;
   final ImagePicker picker = ImagePicker();
-  final AudioRecorder recorder = AudioRecorder(); // Keep AudioRecorder as is
+  final AudioRecorder recorder = AudioRecorder();
   final AudioPlayer player = AudioPlayer();
 
-  // Method to pick image from gallery
   Future<void> pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -37,17 +37,16 @@ class _AddFlashcardState extends State<AddFlashcard> {
     }
   }
 
-  // Method to get valid file path for saving the audio file
   Future<String> getFilePath() async {
     final directory = await getApplicationDocumentsDirectory();
     return '${directory.path}/audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
   }
 
-  // Start recording audio
   Future<void> record() async {
     try {
-      filePath = await getFilePath(); // Ensure valid file path
-      await recorder.start(const RecordConfig(), path: filePath!); // Pass valid path to start recording
+      filePath = await getFilePath();
+      await recorder.start(const RecordConfig(), path: filePath!);
+      print('recording');
       setState(() {
         isRecording = true;
       });
@@ -56,30 +55,42 @@ class _AddFlashcardState extends State<AddFlashcard> {
     }
   }
 
-  // Stop recording audio
-  Future<void> stop() async {
+  Future<void> stopRecording() async {
     try {
-      await recorder.stop(); // Stop recording
+      await recorder.stop();
       setState(() {
-        if(isRecording == true) {
+        if (isRecording == true) {
           isRecording = false;
         }
-        // isRecording = false;
-        debugPrint('filePath: $filePath');
       });
+      print(filePath);
     } catch (e) {
       debugPrint("Error stopping recording: $e");
     }
   }
 
-  // Play recorded audio
   Future<void> play() async {
     try {
       if (filePath != null && !isRecording) {
-        await player.play(UrlSource(filePath!)); // Play the saved audio file
+        if (!isPlaying) {
+          await player.play(UrlSource(filePath!));
+          setState(() {
+            isPlaying = true;
+          });
+          player.onPlayerComplete.listen((event) {
+            setState(() {
+              isPlaying = false;
+            });
+          });
+        } else {
+          await player.stop(); // Stop the audio playback
+          setState(() {
+            isPlaying = false;
+          });
+        }
       }
     } catch (e) {
-      debugPrint("Error playing audio: $e");
+      debugPrint("Error playing/stopping audio: $e");
     }
   }
 
@@ -115,7 +126,6 @@ class _AddFlashcardState extends State<AddFlashcard> {
       body: Center(
         child: SingleChildScrollView(
           child: Column(
-
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -132,7 +142,6 @@ class _AddFlashcardState extends State<AddFlashcard> {
                 ),
               ),
               const SizedBox(height: 32),
-              // Question input field
               TextField(
                 controller: question,
                 decoration: const InputDecoration(
@@ -143,7 +152,6 @@ class _AddFlashcardState extends State<AddFlashcard> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Answer input field
               TextField(
                 controller: answer,
                 decoration: const InputDecoration(
@@ -154,7 +162,6 @@ class _AddFlashcardState extends State<AddFlashcard> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Tag input field
               TextField(
                 controller: tag,
                 decoration: const InputDecoration(
@@ -165,24 +172,26 @@ class _AddFlashcardState extends State<AddFlashcard> {
                 ),
               ),
               const SizedBox(height: 32),
-              // Recording status
               if (isRecording)
                 const Text(
                   'Recording',
                   style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                 ),
               const SizedBox(height: 16),
-              // Record/Stop button
               ElevatedButton(
-                onPressed: isRecording ? stop : record,
-
-                child: isRecording ? const Text('Stop') : const Text('Record'),
+                 onPressed: (){
+                  if(isRecording == true){
+                    stopRecording();
+                  }else{
+                    record();
+                  }
+                 } ,//isRecording ? stopRecording : record,
+                child: isRecording ? const Text('Stop Recording') : const Text('Record'),
               ),
-              // Play button (visible when recording stops and file exists)
               if (!isRecording && filePath != null)
                 ElevatedButton(
                   onPressed: play,
-                  child: const Icon(Icons.play_arrow_sharp),
+                  child: isPlaying ? const Text('Stop Audio') : const Text('Play Audio'),
                 ),
             ],
           ),
@@ -191,3 +200,4 @@ class _AddFlashcardState extends State<AddFlashcard> {
     );
   }
 }
+
