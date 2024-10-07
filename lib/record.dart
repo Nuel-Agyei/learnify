@@ -16,7 +16,9 @@ class _RecordState extends State<Record> {
 
   Future<void> record() async {
     try {
+      if(await recorder.hasPermission()){
       await recorder.start(const RecordConfig(), path: path);
+      }
     } catch (e) {
       debugPrint("Error starting recording: $e");
     }
@@ -24,7 +26,8 @@ class _RecordState extends State<Record> {
 
   Future<void> stopRecording() async {
     try {
-      await recorder.pause();
+      await recorder.stop();
+      recorder.dispose();
     } catch (e) {
       debugPrint("Error stopping recording: $e");
     }
