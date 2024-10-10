@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:learnify/db/entity/remote/db.dart';
-import 'package:learnify/pages/add_flashcard.dart';
 import 'package:learnify/record.dart';
 import 'package:provider/provider.dart';
 

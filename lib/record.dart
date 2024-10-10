@@ -53,7 +53,7 @@ class _RecordState extends State<Record> {
                 onPressed: () {
                   record();
                 },
-                child: Text('Record')
+                child: const Text('Record')
                 ),
             TextButton(
                 onPressed: () {
@@ -65,12 +65,12 @@ class _RecordState extends State<Record> {
                     }
                   });
                 },
-                child: Text('Stop Recording'),),
+                child: const Text('Stop Recording'),),
             TextButton(
                 onPressed: () {
                   player();
                 },
-                child: Text('Play')),
+                child: const Text('Play')),
           ],
         ),
       ),
